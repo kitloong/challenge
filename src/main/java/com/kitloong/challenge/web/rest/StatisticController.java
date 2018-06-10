@@ -26,6 +26,6 @@ public class StatisticController {
     public ResponseEntity<StatisticDto> getStatistic() {
         log.info("get statisticDto");
         StatisticDto statistic = this.statisticService.getStatistic();
-        return new ResponseEntity<>(statistic, HttpStatus.CREATED);
+        return new ResponseEntity<>(statistic, HttpStatus.OK);
     }
 }
