@@ -15,6 +15,14 @@ public class TransactionDto {
     @NotNull
     private long timestamp;
 
+    public TransactionDto() {
+    }
+
+    public TransactionDto(@NotNull double amount, @NotNull long timestamp) {
+        this.amount = amount;
+        this.timestamp = timestamp;
+    }
+
     public double getAmount() {
         return amount;
     }

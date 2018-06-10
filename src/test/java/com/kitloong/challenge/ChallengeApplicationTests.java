@@ -11,6 +11,7 @@ public class ChallengeApplicationTests {
 
 	@Test
 	public void contextLoads() {
+        System.out.println("Run test");
 	}
 
 }
