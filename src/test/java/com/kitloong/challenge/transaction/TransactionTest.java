@@ -113,11 +113,13 @@ public class TransactionTest {
 
         assertThat(Data.collectedTransaction.size()).isEqualTo(5);
 
-        assertThat(Data.collectedMaxAmountTransaction.size()).isEqualTo(5);
-
-        assertThat(Data.collectedMinAmountTransaction.size()).isEqualTo(5);
-
         StatisticDto statistic = this.statisticService.getStatistic();
+
+        assertThat(statistic.sum).isEqualTo(99.0);
+        assertThat(statistic.avg).isEqualTo(12.375);
+        assertThat(statistic.max).isEqualTo(18.0);
+        assertThat(statistic.min).isEqualTo(5.0);
+        assertThat(statistic.count).isEqualTo(8);
 
         assertThat(statistic).isEqualTo(new StatisticDto(
                 99.0,

@@ -28,31 +28,17 @@ public class TransactionService {
 
             Data.collectedTransaction.compute(transactionDto.getTimestamp() / 1000, (Long key, CollectedTransaction value) -> {
                 if (value == null) {
-                    return new CollectedTransaction(1, transactionDto.getAmount());
+                    return new CollectedTransaction(1, transactionDto.getAmount(), transactionDto.getAmount(), transactionDto.getAmount());
                 } else {
                     value.setTotalCollected(value.getTotalCollected() + 1);
                     value.setTotalAmount(value.getTotalAmount() + transactionDto.getAmount());
-                    return value;
-                }
-            });
 
-            Data.collectedMaxAmountTransaction.compute(transactionDto.getTimestamp() / 1000, (Long key, TransactionDto value) -> {
-                if (value == null) {
-                    return transactionDto;
-                } else {
-                    if (value.getAmount() < transactionDto.getAmount()) {
-                        return transactionDto;
+                    if (value.getMax() < transactionDto.getAmount()) {
+                        value.setMax(transactionDto.getAmount());
                     }
-                    return value;
-                }
-            });
 
-            Data.collectedMinAmountTransaction.compute(transactionDto.getTimestamp() / 1000, (Long key, TransactionDto value) -> {
-                if (value == null) {
-                    return transactionDto;
-                } else {
-                    if (value.getAmount() > transactionDto.getAmount()) {
-                        return transactionDto;
+                    if (value.getMin() > transactionDto.getAmount()) {
+                        value.setMin(transactionDto.getAmount());
                     }
                     return value;
                 }

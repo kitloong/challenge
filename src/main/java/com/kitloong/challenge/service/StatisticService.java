@@ -10,10 +10,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 
 /**
  * Created by Kit Loong on 10/6/2018.
@@ -62,18 +59,34 @@ public class StatisticService {
         log.info("time now {}", timeNow);
         log.info("time one minute ago {}", timeOneMinuteAgo);
 
-        final List<CollectedTransaction> transactionToReport = new ArrayList<>();
+        // final List<CollectedTransaction> transactionToReport = new ArrayList<>();
+
+        double sum = 0;
+        double min = 0;
+        double max = 0;
+        long count = 0;
 
         for (long i = timeNow; i >= timeOneMinuteAgo; i--) {
             final CollectedTransaction value = Data.collectedTransaction.get(i);
             if (value != null) {
-                transactionToReport.add(Data.collectedTransaction.get(i));
+                sum += value.getTotalAmount();
+                count += value.getTotalCollected();
+
+                if (value.getMax() > max) {
+                    max = value.getMax();
+                }
+
+                if (min == 0) {
+                    min = value.getMin();
+                } else if (value.getMin() < min) {
+                    min = value.getMin();
+                }
             }
             log.info("time {}", i);
             log.info("contain {}", Data.collectedTransaction.get(i));
         }
 
-        TransactionDto max = Data.collectedMaxAmountTransaction.entrySet().stream()
+        /*TransactionDto max = Data.collectedMaxAmountTransaction.entrySet().stream()
                 .max(Comparator.comparingDouble(entry -> entry.getValue().getAmount()))
                 .orElse(new HashMap.SimpleEntry<>(0L, new TransactionDto(0.0, 0L)))
                 .getValue();
@@ -84,11 +97,10 @@ public class StatisticService {
                 .getValue();
 
         final long count = transactionToReport.stream().mapToLong(CollectedTransaction::getTotalCollected).sum();
-        final double sum = transactionToReport.stream().mapToDouble(CollectedTransaction::getTotalAmount).sum();
+        final double sum = transactionToReport.stream().mapToDouble(CollectedTransaction::getTotalAmount).sum();*/
 
-        log.info("transaction to report {}", transactionToReport);
-        log.info("Max {}", max.getAmount());
-        log.info("Min {}", min.getAmount());
+        log.info("Max {}", max);
+        log.info("Min {}", min);
         log.info("Count {}", count);
         log.info("Sum {}", sum);
         log.info("Avg {}", (count != 0 ? sum / count : 0));
@@ -96,8 +108,8 @@ public class StatisticService {
         return new StatisticDto(
                 sum,
                 (count != 0 ? sum / count : 0),
-                max.getAmount(),
-                min.getAmount(),
+                max,
+                min,
                 count
         );
     }
@@ -109,14 +121,15 @@ public class StatisticService {
     @Scheduled(cron = "* * * * * *")
     public void removeObsoleteTransaction() {
         final long timeNow = TimeUtil.epochTimeNow() / 1000;
-        Data.collectedTransaction.remove(timeNow - 61);
-        Data.collectedMaxAmountTransaction.remove(timeNow - 61);
-        Data.collectedMinAmountTransaction.remove(timeNow - 61);
+        final long timeOneMinuteAgo = timeNow - 60;
 
-        log.info("Removed time {}", timeNow - 61);
+        final Set<Long> set = new HashSet<>();
+        for (long i = timeNow; i >= timeOneMinuteAgo; i--) {
+            set.add(i);
+        }
+        Data.collectedTransaction.keySet().retainAll(set);
+
         log.info("Cleaned collectedTransaction {}", Data.collectedTransaction);
-        log.info("Cleaned collectedMaxAmountTransaction {}", Data.collectedMaxAmountTransaction);
-        log.info("Cleaned collectedMinAmountTransaction{}", Data.collectedMinAmountTransaction);
         log.info("removeObsoleteTransaction ran");
     }
 }

@@ -13,8 +13,4 @@ public final class Data {
      * <UnixTimestamp, CollectedTransaction>
      */
     public static final ConcurrentHashMap<Long, CollectedTransaction> collectedTransaction = new ConcurrentHashMap<>();
-
-    public static final ConcurrentHashMap<Long, TransactionDto> collectedMaxAmountTransaction = new ConcurrentHashMap<>();
-
-    public static final ConcurrentHashMap<Long, TransactionDto> collectedMinAmountTransaction = new ConcurrentHashMap<>();
 }
